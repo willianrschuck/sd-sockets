@@ -1,18 +1,28 @@
 package socket;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import socket.method.DeleteAd;
 import socket.method.Login;
 import socket.method.Logout;
+import socket.method.ProtocolMethod;
 import socket.method.SearchAd;
 import socket.method.SendAd;
 
 public class ClientServentThread extends Thread {
 	
 	private Cliente client;
+	private Map<String, ProtocolMethod> methods;
 
 	public ClientServentThread(Cliente client) {
 		this.client = client;
+		methods = new HashMap<>();
+		methods.put("login", new Login());
+		methods.put("logout", new Logout());
+		methods.put("sendad", new SendAd());
+		methods.put("deletead", new DeleteAd());
+		methods.put("searchad", new SearchAd());	
 	}
 
 	@Override
@@ -65,20 +75,9 @@ public class ClientServentThread extends Thread {
 	}
 
 	private Response handeRequest(Message message) {
-		if (message.getMethod().equals("LOGIN")) {
-			return new Login().handleMessage(client, message);
-		}
-		if (message.getMethod().equals("LOGOUT")) {
-			return new Logout().handleMessage(client, message);
-		}
-		if (message.getMethod().equals("SENDAD")) {
-			return new SendAd().handleMessage(client, message);
-		}
-		if (message.getMethod().equals("DELETEAD")) {
-			return new DeleteAd().handleMessage(client, message);
-		}
-		if (message.getMethod().equals("SEARCHAD")) {
-			return new SearchAd().handleMessage(client, message);
+		ProtocolMethod method = methods.get(message.getMethod());
+		if (method != null) {
+			return method.handleMessage(client, message);
 		}
 		return new Response("METHOD NOT FOUND");
 	}
