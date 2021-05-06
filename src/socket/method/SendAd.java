@@ -2,54 +2,74 @@ package socket.method;
 
 import static java.util.Arrays.asList;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import model.Ad;
 import socket.Cliente;
 import socket.Database;
 import socket.Message;
 import socket.Response;
+import socket.ResponseStatus;
 
 public class SendAd implements ProtocolMethod {
+	
+	private static final int defaultPriority = 5;
+	private static final Double pricePerChar = 0.5; 
 	
 	@Override
 	public Response handleMessage(Cliente cliente, Message message) {
 		
 		if (!cliente.isAutenticado()) {
-			return new Response("UNAUTHORIZED");
+			return Response.status(ResponseStatus.UNAUTHORIZED).message("Client not authenticated");
 		}
 		
-		Ad ad = new Ad();
-		ad.setName(message.getParamValue("name"));
-		ad.setKeywords(asList(message.getParamValue("keywords")));
-		ad.setTarget(message.getParamValue("target"));
-		ad.setText(message.getParamValue("text"));
-		ad.setPriority(Integer.parseInt(message.getParamValue("priority")));
-		ad.setSchedule(parseSchedule(message.getParamValue("schedule")));
-		ad.setUser(cliente.getUser());
+		try {
+			
+			Ad ad = extractAd(cliente, message);
+			validate(ad);
+			Database.save(ad);
+			
+		} catch (Exception e) {
+			
+			return Response.status(ResponseStatus.BAD_REQUEST).message(e.getMessage());
+			
+		}
 		
-		Database.save(ad);
-		System.out.println(ad);
-		
-		return new Response("OK");
+		return Response.ok();
 		
 	}
 
-	private List<Date> parseSchedule(String scheduleText) {
-		List<Date> schedule = new ArrayList<>();
-		String[] scheduleFormatedDates = scheduleText.split(",");
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		for (String formatedDate : scheduleFormatedDates) {
-			try {
-				schedule.add(dateFormat.parse(formatedDate));
-			} catch (Exception e) {
-				//
-			}
+	private void validate(Ad ad) throws Exception {
+		if (ad.getName() == null || ad.getName().trim().isEmpty()) {
+			throw new Exception("The field name was left blank");
 		}
-		return schedule;
+		if (ad.getText() == null || ad.getText().trim().isEmpty()) {
+			throw new Exception("The field text was left blank");
+		}
+		if (ad.getAdPrice() == null) {
+			throw new Exception("The field adPrice was left blank");
+		}
+		if (ad.getAdPrice() <= 0.0) {
+			throw new Exception("The field adPrice cannot have values equals or below zero");
+		}
+	}
+
+	private Ad extractAd(Cliente cliente, Message message) {
+		Ad ad = new Ad();
+		
+		ad.setName(message.getString("name"));
+		ad.setKeywords(asList(message.getString("keywords")));
+		ad.setText(message.getString("text"));
+		ad.setProductPrice(message.getDouble("price"));
+		ad.setPriority(message.getInteger("priority"));
+		ad.setUser(cliente.getUser());
+		
+		if (ad.getPriority() == null) {
+			ad.setPriority(defaultPriority);
+		}
+		
+		double priorityMultiplier = ad.getPriority() / 5.0;
+		ad.setAdPrice(ad.getText().length() * pricePerChar * priorityMultiplier);
+		
+		return ad;
 	}
 	
 }

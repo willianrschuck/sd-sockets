@@ -56,14 +56,21 @@ public class Database {
 	}
 	
 
-	public static List<Ad> searchAd(String fieldName, String value) {
+	public static List<Ad> searchAd(String fieldName, Object value) {
 		List<Ad> resultAds = new ArrayList<Ad>();
 		try {
 			Method readMethod = new PropertyDescriptor(fieldName, Ad.class).getReadMethod();
 			for (Ad ad : ads) {
-				String theValue = (String) readMethod.invoke(ad);
-				if (theValue.contains(value)) {
-					resultAds.add(ad);
+				Object theValue = readMethod.invoke(ad);
+				
+				if (theValue instanceof String && value instanceof String) {
+					if (((String) theValue).contains(((String) value))) {
+						resultAds.add(ad);
+					}
+				} else {
+					if (theValue.equals(value)) {
+						resultAds.add(ad);
+					}
 				}
 			}
 		} catch (Exception e) {

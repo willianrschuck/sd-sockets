@@ -3,7 +3,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import socket.method.ConfirmAd;
 import socket.method.DeleteAd;
+import socket.method.ListAds;
 import socket.method.Login;
 import socket.method.Logout;
 import socket.method.ProtocolMethod;
@@ -22,7 +24,9 @@ public class ClientServentThread extends Thread {
 		methods.put("logout", new Logout());
 		methods.put("sendad", new SendAd());
 		methods.put("deletead", new DeleteAd());
-		methods.put("searchad", new SearchAd());	
+		methods.put("searchad", new SearchAd());
+		methods.put("listads", new ListAds());
+		methods.put("confirmad", new ConfirmAd());
 	}
 
 	@Override
@@ -44,13 +48,16 @@ public class ClientServentThread extends Thread {
 			}
 			
 		} catch (IOException e) {
-			// Nada a fazer
+			e.printStackTrace();
 		}
 		
 	}
 
 	private void sendResponse(Response response) {
 		client.out.println(response.getStatus());
+		if (response.getMessage() != null && !response.getMessage().isEmpty()) {
+			client.out.println(response.getMessage());
+		}
 	}
 
 	private Message readMessage() throws IOException {
@@ -64,9 +71,16 @@ public class ClientServentThread extends Thread {
 		Message message = new Message();
 		
 		message.setMethod(line);
-		while (!(line = client.in.readLine()).equals("end")) {
-			String[] split = line.split("=");
-			message.setParam(split[0], split[1]);
+		while ( (line = client.in.readLine()) != null ) {
+			if (line.equals("END")) {
+				break;
+			}
+			try {
+				String[] split = line.split("=");
+				message.setParam(split[0], split[1]);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		
 		return message;
@@ -75,11 +89,18 @@ public class ClientServentThread extends Thread {
 	}
 
 	private Response handeRequest(Message message) {
-		ProtocolMethod method = methods.get(message.getMethod());
+		
+		if (message == null) {
+			return Response.status(ResponseStatus.BAD_REQUEST);
+		}
+		
+		ProtocolMethod method = methods.get(message.getMethod().toLowerCase());
 		if (method != null) {
 			return method.handleMessage(client, message);
 		}
-		return new Response("METHOD NOT FOUND");
+		
+		return Response.status(ResponseStatus.BAD_REQUEST).message("Method not found");
+		
 	}
 	
 }

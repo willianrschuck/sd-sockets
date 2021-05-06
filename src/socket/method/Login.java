@@ -5,24 +5,27 @@ import socket.Cliente;
 import socket.Database;
 import socket.Message;
 import socket.Response;
+import socket.ResponseStatus;
 
 public class Login implements ProtocolMethod {
 	
 	@Override
 	public Response handleMessage(Cliente cliente, Message message) {
 		
-		String username = message.getParamValue("username");
-		String password = message.getParamValue("password");
+		String username = message.getString("username");
+		String password = message.getString("password");
 		
 		User user = Database.getUserBy(username);
 		
 		if (user != null && user.getPassword().equals(password)) {
+			
 			cliente.setAutenticado(true);
 			cliente.setUser(user);
-			return new Response("OK");
+			return Response.ok();
+			
 		}
 		
-		return new Response("UNAUTHORIZED");
+		return Response.status(ResponseStatus.UNAUTHORIZED);
 		
 	}
 	

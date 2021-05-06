@@ -8,8 +8,8 @@ import socket.Message;
 import socket.Response;
 import socket.ResponseStatus;
 
-public class DeleteAd implements ProtocolMethod {
-	
+public class ConfirmAd implements ProtocolMethod {
+
 	@Override
 	public Response handleMessage(Cliente cliente, Message message) {
 		
@@ -20,13 +20,13 @@ public class DeleteAd implements ProtocolMethod {
 		Integer adId = Integer.parseInt(message.getString("id"));
 		Ad ad = Database.getAd(adId);
 		
-		if (ad.getStatus() == AdStatus.CONFIRMED) {
-			return Response.status(ResponseStatus.UNAUTHORIZED).message("Ad is already confirmed.");
+		if (ad.getStatus() == AdStatus.PENDING) {
+			ad.setStatus(AdStatus.CONFIRMED);
 		}
 		
-		Database.deleteAd(ad);
-		return Response.status(ResponseStatus.OK);
+		
+		return Response.ok();
 		
 	}
-	
+
 }

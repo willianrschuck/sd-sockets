@@ -20,8 +20,18 @@ public class Message {
 		params.put(key, value);
 	}
 	
-	public String getParamValue(String key) {
+	public String getString(String key) {
 		return params.get(key);
+	}
+	
+	public Integer getInteger(String key) {
+		String value = params.get(key);
+		return value != null ? Integer.parseInt(value) : null;
+	}
+	
+	public Double getDouble(String key) {
+		String value = params.get(key);
+		return value != null ? Double.parseDouble(value) : null;
 	}
 
 	@Override

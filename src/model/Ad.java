@@ -1,19 +1,24 @@
 package model;
 
-import java.util.Date;
 import java.util.List;
 
-public class Ad {
+public class Ad implements Comparable<Ad> {
 	
 	private Integer id;
 	private String name;
-	private String target;
 	private String text;
 	private Integer priority;
+	private Double productPrice;
+	private Double adPrice;
 	private List<String> keywords;
-	private List<Date> schedule;
+	private AdStatus status;
 	private User user;
-
+	
+	public Ad() {
+		status = AdStatus.PENDING;
+		priority = 5;
+	}
+	
 	public Integer getId() {
 		return id;
 	}
@@ -28,14 +33,6 @@ public class Ad {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getTarget() {
-		return target;
-	}
-
-	public void setTarget(String target) {
-		this.target = target;
 	}
 
 	public String getText() {
@@ -54,6 +51,22 @@ public class Ad {
 		this.priority = priority;
 	}
 
+	public Double getProductPrice() {
+		return productPrice;
+	}
+	
+	public void setProductPrice(Double productPrice) {
+		this.productPrice = productPrice;
+	}
+	
+	public Double getAdPrice() {
+		return adPrice;
+	}
+	
+	public void setAdPrice(Double adPrice) {
+		this.adPrice = adPrice;
+	}
+	
 	public List<String> getKeywords() {
 		return keywords;
 	}
@@ -62,12 +75,12 @@ public class Ad {
 		this.keywords = keywords;
 	}
 
-	public List<Date> getSchedule() {
-		return schedule;
+	public AdStatus getStatus() {
+		return status;
 	}
-
-	public void setSchedule(List<Date> schedule) {
-		this.schedule = schedule;
+	
+	public void setStatus(AdStatus status) {
+		this.status = status;
 	}
 	
 	public User getUser() {
@@ -79,9 +92,8 @@ public class Ad {
 	}
 
 	@Override
-	public String toString() {
-		return "Ad [id=" + id + ", name=" + name + ", target=" + target + ", text=" + text + ", priority=" + priority
-				+ ", keywords=" + keywords + ", schedule=" + schedule + "]";
+	public int compareTo(Ad other) {
+		return priority.compareTo(other.priority);
 	}
-	
+
 }

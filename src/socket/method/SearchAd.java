@@ -1,5 +1,6 @@
 package socket.method;
 
+import java.util.Collections;
 import java.util.List;
 
 import model.Ad;
@@ -13,18 +14,16 @@ public class SearchAd implements ProtocolMethod {
 	@Override
 	public Response handleMessage(Cliente cliente, Message message) {
 		
-		if (!cliente.isAutenticado()) {
-			return new Response("UNAUTHORIZED");
-		}
-
-		String field = message.getParamValue("field");
-		String value = message.getParamValue("value");
+		String field = message.getString("field");
+		String value = message.getString("value");
 		
 		List<Ad> searchAd = Database.searchAd(field, value);
 		
-		System.out.println(searchAd);
-		
-		return new Response("OK");
+		Collections.sort(searchAd);
+		if (searchAd.size() > 5) {
+			searchAd.subList(0, 4);
+		}
+		return Response.ok();
 		
 	}
 	
