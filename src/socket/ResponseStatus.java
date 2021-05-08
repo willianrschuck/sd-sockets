@@ -1,5 +1,5 @@
 package socket;
 
 public enum ResponseStatus {
-	OK, UNAUTHORIZED, BAD_REQUEST;
+	OK, UNAUTHORIZED, ERROR, BAD_REQUEST;
 }

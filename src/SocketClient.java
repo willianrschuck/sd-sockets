@@ -45,20 +45,11 @@ public class SocketClient extends Thread {
 			BufferedReader teclado = new BufferedReader(new InputStreamReader(System.in));
 			PrintStream saida = new PrintStream(conexao.getOutputStream());
 
-			/*
-			 * Essa thread vai cuidar do recebimento de mensagens. Sem ela o programa
-			 * ficaria parado esperando o usuário digitar algo e não leria corretamente as
-			 * mensagens enviadas pelo servidor
-			 */
 			new SocketClient(conexao).start();
 
-			/* O envio de mensagens pelo cliente é executado pelo main */
 			String mensagem;
 			while (conexaoEstaAtiva) {
 				mensagem = teclado.readLine();
-				if (mensagem.trim().isEmpty()) {
-					break;
-				}
 				saida.println(mensagem);
 			}
 			conexao.close();

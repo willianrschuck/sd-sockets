@@ -1,6 +1,7 @@
 package socket.method;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import model.Ad;
@@ -23,7 +24,18 @@ public class SearchAd implements ProtocolMethod {
 		if (searchAd.size() > 5) {
 			searchAd.subList(0, 4);
 		}
-		return Response.ok();
+		
+		StringBuilder serializedAds = new StringBuilder();
+		Iterator<Ad> iterator = searchAd.iterator();
+
+		while (iterator.hasNext()) {
+			serializedAds.append(iterator.next().serialize());
+			if (iterator.hasNext()) {
+				serializedAds.append("|");
+			}
+		}
+		
+		return Response.ok().message(serializedAds.toString());
 		
 	}
 	

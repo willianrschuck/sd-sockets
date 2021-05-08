@@ -14,10 +14,10 @@ public class Logout implements ProtocolMethod {
 			
 			cliente.setAutenticado(false);
 			cliente.setUser(null);
-			return Response.ok();
+			return Response.ok().message("Successfully logged out");
 			
 		}
-		return Response.status(ResponseStatus.UNAUTHORIZED);
+		return Response.status(ResponseStatus.UNAUTHORIZED).message("Already logged out");
 		
 	}
 	

@@ -4,6 +4,8 @@ import java.util.List;
 
 public class Ad implements Comparable<Ad> {
 	
+	private static final char SEPARATOR = ';';
+	
 	private Integer id;
 	private String name;
 	private String text;
@@ -89,6 +91,25 @@ public class Ad implements Comparable<Ad> {
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+	
+	
+	public String serialize() {
+		StringBuilder out = new StringBuilder();
+		
+		out.append("id:").append(id);
+		if (name != null) {
+			out.append("name:").append(name).append(SEPARATOR);
+		}
+		if (text != null) {
+			out.append("text:").append(text).append(SEPARATOR);
+		}
+		out.append("priority:").append(priority).append(SEPARATOR);
+		out.append("productPrice:").append(getProductPrice()).append(SEPARATOR);
+		out.append("adPrice:").append(getAdPrice()).append(SEPARATOR);
+		out.append("status:").append(status);
+
+		return out.toString();
 	}
 
 	@Override

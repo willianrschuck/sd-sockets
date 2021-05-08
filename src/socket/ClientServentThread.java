@@ -2,7 +2,9 @@ package socket;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import socket.method.Buy;
 import socket.method.ConfirmAd;
 import socket.method.DeleteAd;
 import socket.method.ListAds;
@@ -27,6 +29,7 @@ public class ClientServentThread extends Thread {
 		methods.put("searchad", new SearchAd());
 		methods.put("listads", new ListAds());
 		methods.put("confirmad", new ConfirmAd());
+		methods.put("buy", new Buy());
 	}
 
 	@Override
@@ -54,10 +57,16 @@ public class ClientServentThread extends Thread {
 	}
 
 	private void sendResponse(Response response) {
+		
 		client.out.println(response.getStatus());
-		if (response.getMessage() != null && !response.getMessage().isEmpty()) {
-			client.out.println(response.getMessage());
+		
+		Map<String, String> parameters = response.getParameters();
+		for (Entry<String, String> entry : parameters.entrySet()) {
+			client.out.print(entry.getKey());
+			client.out.print("=");
+			client.out.println(entry.getValue());
 		}
+		
 	}
 
 	private Message readMessage() throws IOException {
@@ -72,7 +81,7 @@ public class ClientServentThread extends Thread {
 		
 		message.setMethod(line);
 		while ( (line = client.in.readLine()) != null ) {
-			if (line.equals("END")) {
+			if (line.trim().isEmpty()) {
 				break;
 			}
 			try {

@@ -21,11 +21,11 @@ public class Login implements ProtocolMethod {
 			
 			cliente.setAutenticado(true);
 			cliente.setUser(user);
-			return Response.ok();
+			return Response.ok().message("Logged in with success");
 			
 		}
 		
-		return Response.status(ResponseStatus.UNAUTHORIZED);
+		return Response.status(ResponseStatus.UNAUTHORIZED).message("Invalid username or password");
 		
 	}
 	

@@ -1,5 +1,6 @@
 package socket.method;
 
+import java.util.Iterator;
 import java.util.List;
 
 import model.Ad;
@@ -20,9 +21,17 @@ public class ListAds implements ProtocolMethod {
 		
 		List<Ad> searchAd = Database.searchAd("user", cliente.getUser());
 		
-		System.out.println(searchAd);
+		StringBuilder serializedAds = new StringBuilder();
+		Iterator<Ad> iterator = searchAd.iterator();
+
+		while (iterator.hasNext()) {
+			serializedAds.append(iterator.next().serialize());
+			if (iterator.hasNext()) {
+				serializedAds.append("|");
+			}
+		}
 		
-		return Response.ok();
+		return Response.ok().message(serializedAds.toString());
 		
 	}
 

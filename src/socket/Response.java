@@ -1,9 +1,12 @@
 package socket;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Response {
 
 	private ResponseStatus status;
-	private String message;
+	private Map<String, String> parameters = new HashMap<>();
 
 	private Response(ResponseStatus status) {
 		this.status = status;
@@ -18,7 +21,12 @@ public class Response {
 	}
 	
 	public Response message(String message) {
-		this.message = message;
+		this.parameters.put("message", message);
+		return this;
+	}
+	
+	public Response addParameter(String name, String value) {
+		this.parameters.put(name, value);
 		return this;
 	}
 	
@@ -26,8 +34,8 @@ public class Response {
 		return status.toString();
 	}
 	
-	public String getMessage() {
-		return message;
+	public Map<String, String> getParameters() {
+		return parameters;
 	}
 	
 }
