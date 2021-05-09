@@ -1,0 +1,19 @@
+LOGIN
+username=ana
+password=ana
+
+SENDAD
+name=Mão de Midas
+text=Preservada por meios mágicos desconhecidos, a Mão de Midas é uma arma da ganância, sacrificando animais para encher os bolsos do seu dono.
+price=5.0
+priority=5
+
+SENDAD
+name=Coração de Tarrasque
+text=O coração preservado de um monstro extinto, ele aumenta o poder do seu portador.
+price=5.0
+priority=4
+
+CONFIRMAD
+id=1
+

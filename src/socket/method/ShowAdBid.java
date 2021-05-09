@@ -8,7 +8,7 @@ import socket.Message;
 import socket.Response;
 import socket.ResponseStatus;
 
-public class ConfirmAd implements ProtocolMethod {
+public class ShowAdBid implements ProtocolMethod {
 
 	@Override
 	public Response handleMessage(Cliente cliente, Message message) {
@@ -17,23 +17,27 @@ public class ConfirmAd implements ProtocolMethod {
 			return Response.status(ResponseStatus.UNAUTHORIZED);
 		}
 		
-		Integer adId = Integer.parseInt(message.getString("id"));
-		Ad ad = Database.getAd(adId);
+		Ad ad = Database.getAd(message.getInteger("id"));
 		
 		if (ad == null) {
 			return Response.status(ResponseStatus.ERROR).message("Ad not found");
 		}
 		
-		if (ad.getUser() != cliente.getUser()) {
-			return Response.status(ResponseStatus.UNAUTHORIZED)
-					.message("This ad is not owned by you");
+		if (ad.getStatus() == AdStatus.SOLD) {
+			return Response.ok().message("Ad was already sold");
 		}
 		
 		if (ad.getStatus() == AdStatus.PENDING) {
-			ad.setStatus(AdStatus.CONFIRMED);
+			return Response.ok().message("Ad still pending");
 		}
 		
-		return Response.ok().message("Ad confirmed");
+		if (ad.getStatus() == AdStatus.CONFIRMED) {
+			return Response.ok().message("Ad has no bids");
+		}
+		
+		return Response.ok()
+				.addParameter("user", ad.getBid().getUser().getUsername())
+				.addParameter("value", ad.getBid().getValue().toString());
 		
 	}
 

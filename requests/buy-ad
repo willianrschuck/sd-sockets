@@ -1,0 +1,12 @@
+LOGIN
+username=bruna
+password=bruna
+
+BUY
+id=2
+value=10
+
+BUY
+id=1
+value=20
+

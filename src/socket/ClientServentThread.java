@@ -4,15 +4,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import socket.method.AcceptBid;
 import socket.method.Buy;
 import socket.method.ConfirmAd;
 import socket.method.DeleteAd;
 import socket.method.ListAds;
+import socket.method.ListBids;
+import socket.method.LockAdForLongTime;
 import socket.method.Login;
 import socket.method.Logout;
 import socket.method.ProtocolMethod;
+import socket.method.RefuseBid;
 import socket.method.SearchAd;
 import socket.method.SendAd;
+import socket.method.ShowAdBid;
 
 public class ClientServentThread extends Thread {
 	
@@ -30,6 +35,12 @@ public class ClientServentThread extends Thread {
 		methods.put("listads", new ListAds());
 		methods.put("confirmad", new ConfirmAd());
 		methods.put("buy", new Buy());
+		methods.put("lockadforlongtime", new LockAdForLongTime());
+		methods.put("listbids", new ListBids());
+		methods.put("acceptbid", new AcceptBid());
+		methods.put("refusebid", new RefuseBid());
+		methods.put("showadbid", new ShowAdBid());
+		methods.put("listbids", new ListBids());
 	}
 
 	@Override
@@ -100,15 +111,24 @@ public class ClientServentThread extends Thread {
 	private Response handeRequest(Message message) {
 		
 		if (message == null) {
-			return Response.status(ResponseStatus.BAD_REQUEST);
+			return Response.status(ResponseStatus.BAD_REQUEST).message("Invalid request");
 		}
 		
-		ProtocolMethod method = methods.get(message.getMethod().toLowerCase());
-		if (method != null) {
-			return method.handleMessage(client, message);
+		try {
+			
+			ProtocolMethod method = methods.get(message.getMethod().toLowerCase());
+			if (method != null) {
+				return method.handleMessage(client, message);
+			}
+			return Response.status(ResponseStatus.BAD_REQUEST).message("Method not found");
+			
+		} catch (Exception e) {
+			
+			e.printStackTrace();
+			return Response.status(ResponseStatus.ERROR).message("Error during the request processing");
+			
 		}
 		
-		return Response.status(ResponseStatus.BAD_REQUEST).message("Method not found");
 		
 	}
 	

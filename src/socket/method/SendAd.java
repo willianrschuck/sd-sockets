@@ -1,7 +1,5 @@
 package socket.method;
 
-import static java.util.Arrays.asList;
-
 import model.Ad;
 import socket.Cliente;
 import socket.Database;
@@ -33,7 +31,7 @@ public class SendAd implements ProtocolMethod {
 			
 		}
 		
-		return Response.ok();
+		return Response.ok().message("Ad recived");
 		
 	}
 
@@ -56,7 +54,6 @@ public class SendAd implements ProtocolMethod {
 		Ad ad = new Ad();
 		
 		ad.setName(message.getString("name"));
-		ad.setKeywords(asList(message.getString("keywords")));
 		ad.setText(message.getString("text"));
 		ad.setProductPrice(message.getDouble("price"));
 		ad.setPriority(message.getInteger("priority"));

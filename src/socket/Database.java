@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.Ad;
+import model.Bid;
 import model.User;
 
 public class Database {
@@ -16,14 +17,17 @@ public class Database {
 
 	static List<User> usuarios;
 	static List<Ad> ads;
+	static List<Bid> bids;
 	
 	static {
 		usuarios = new ArrayList<>();
-		usuarios.add(new User("admin", "admin"));
+		usuarios.add(new User("ana", "ana"));
+		usuarios.add(new User("bruna", "bruna"));
 	}
 	
 	static {
 		ads = new ArrayList<>();
+		bids = new ArrayList<>();
 	}
 
 	
@@ -42,6 +46,20 @@ public class Database {
 	public static void save(Ad ad) {
 		ad.setId(adSequence++);
 		ads.add(ad);
+	}
+	
+	public static void save(Bid bid) {
+		bids.add(bid);
+	}
+	
+	public static List<Bid> getBids(User user) {
+		List<Bid> result = new ArrayList<>();
+		for (Bid bid : bids) {
+			if (bid.getUser() == user) {
+				result.add(bid);
+			}
+		}
+		return result;
 	}
 	
 	

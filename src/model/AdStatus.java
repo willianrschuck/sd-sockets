@@ -1,5 +1,5 @@
 package model;
 
 public enum AdStatus {
-	PENDING, CONFIRMED, SOLD;
+	PENDING, CONFIRMED, BID_PENDING, SOLD;
 }

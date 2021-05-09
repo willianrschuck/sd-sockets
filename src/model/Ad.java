@@ -1,8 +1,6 @@
 package model;
 
-import java.util.List;
-
-public class Ad implements Comparable<Ad> {
+public class Ad implements ConcurrentEntity, Comparable<Ad> {
 	
 	private static final char SEPARATOR = ';';
 	
@@ -12,9 +10,11 @@ public class Ad implements Comparable<Ad> {
 	private Integer priority;
 	private Double productPrice;
 	private Double adPrice;
-	private List<String> keywords;
 	private AdStatus status;
 	private User user;
+	private User soldFor;
+	private Bid bid;
+	private boolean locked;
 	
 	public Ad() {
 		status = AdStatus.PENDING;
@@ -68,14 +68,6 @@ public class Ad implements Comparable<Ad> {
 	public void setAdPrice(Double adPrice) {
 		this.adPrice = adPrice;
 	}
-	
-	public List<String> getKeywords() {
-		return keywords;
-	}
-
-	public void setKeywords(List<String> keywords) {
-		this.keywords = keywords;
-	}
 
 	public AdStatus getStatus() {
 		return status;
@@ -93,11 +85,45 @@ public class Ad implements Comparable<Ad> {
 		this.user = user;
 	}
 	
+	public User getSoldFor() {
+		return soldFor;
+	}
+	
+	public void setSoldFor(User soldFor) {
+		this.soldFor = soldFor;
+	}
+	
+	public Bid getBid() {
+		return bid;
+	}
+	
+	public void setBid(Bid bid) {
+		this.bid = bid;
+	}
+	
+	@Override
+	public synchronized void lock() throws InterruptedException {
+		while (locked) {
+			wait();
+		}
+		locked = true;
+	}
+	
+	@Override
+	public synchronized void unlock() {
+		locked = false;
+		notifyAll();
+	}
+	
+	@Override
+	public boolean isLocked() {
+		return false;
+	}
 	
 	public String serialize() {
 		StringBuilder out = new StringBuilder();
 		
-		out.append("id:").append(id);
+		out.append("id:").append(id).append(SEPARATOR);
 		if (name != null) {
 			out.append("name:").append(name).append(SEPARATOR);
 		}
@@ -107,6 +133,7 @@ public class Ad implements Comparable<Ad> {
 		out.append("priority:").append(priority).append(SEPARATOR);
 		out.append("productPrice:").append(getProductPrice()).append(SEPARATOR);
 		out.append("adPrice:").append(getAdPrice()).append(SEPARATOR);
+		out.append("owner:").append(user.getUsername()).append(SEPARATOR);
 		out.append("status:").append(status);
 
 		return out.toString();
