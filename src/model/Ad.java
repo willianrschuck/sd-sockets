@@ -104,13 +104,16 @@ public class Ad implements ConcurrentEntity, Comparable<Ad> {
 	@Override
 	public synchronized void lock() throws InterruptedException {
 		while (locked) {
+			System.out.println("Waiting to lock ad " + id);
 			wait();
 		}
+		System.out.println("Locking ad " + id);
 		locked = true;
 	}
 	
 	@Override
 	public synchronized void unlock() {
+		System.out.println("Unlocking ad " + id);
 		locked = false;
 		notifyAll();
 	}

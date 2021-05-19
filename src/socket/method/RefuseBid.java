@@ -25,25 +25,36 @@ public class RefuseBid implements ProtocolMethod {
 		}
 		
 		try {
+			
 			ad.lock();
+			
 		} catch (InterruptedException e) {
-			ad.unlock();
+		
 			return Response.status(ResponseStatus.ERROR).message("Internal server error");
+			
 		}
 		
-		if (ad.getUser() != cliente.getUser()) {
-			return Response.status(ResponseStatus.UNAUTHORIZED).message("This ad is not owned by you");
+		
+		try {
+			
+			if (ad.getUser() != cliente.getUser()) {
+				return Response.status(ResponseStatus.UNAUTHORIZED).message("This ad is not owned by you");
+			}
+			
+			if (ad.getStatus() == AdStatus.BID_PENDING) {
+				ad.setStatus(AdStatus.CONFIRMED);
+				ad.getBid().setStatus(Bid.Status.REJECTED);
+				ad.setBid(null);
+			}
+			
+			return Response.ok().message("Bid refused");
+			
+		} finally {
+			
+			ad.unlock();
+			
 		}
 		
-		if (ad.getStatus() == AdStatus.BID_PENDING) {
-			ad.setStatus(AdStatus.CONFIRMED);
-			ad.getBid().setStatus(Bid.Status.REJECTED);
-			ad.setBid(null);
-		}
-		
-		ad.unlock();
-		
-		return Response.ok().message("Bid accepted");
 		
 	}
 

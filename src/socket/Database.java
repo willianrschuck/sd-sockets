@@ -23,6 +23,7 @@ public class Database {
 		usuarios = new ArrayList<>();
 		usuarios.add(new User("ana", "ana"));
 		usuarios.add(new User("bruna", "bruna"));
+		usuarios.add(new User("claudia", "claudia"));
 	}
 	
 	static {

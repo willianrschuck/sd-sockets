@@ -25,46 +25,57 @@ public class Buy implements ProtocolMethod {
 		}
 		
 		try {
+			
 			ad.lock();
+			
 		} catch (InterruptedException e) {
-			ad.unlock();
+		
 			return Response.status(ResponseStatus.ERROR).message("Internal server error");
+			
 		}
 		
-		if (ad.getUser() == cliente.getUser()) {
-			return Response.status(ResponseStatus.ERROR).message("Cannot buy your own ad");
-		}
-		
-		if (ad.getStatus() == AdStatus.SOLD) {
-			return Response.status(ResponseStatus.ERROR).message("Ad was already sold");
-		}
-		
-		if (ad.getStatus() == AdStatus.PENDING) {
-			return Response.status(ResponseStatus.ERROR).message("Ad still pending");
-		}
-		
-		if (ad.getStatus() == AdStatus.BID_PENDING) {
-			return Response.status(ResponseStatus.ERROR).message("Ad already has a bid pending");
-		}
-		
-		Bid bid = new Bid(ad);
-		bid.setUser(cliente.getUser());
-		bid.setValue(message.getDouble("value"));
 		
 		try {
-			validateBid(bid);
-		} catch (Exception e) {
-			return Response.status(ResponseStatus.BAD_REQUEST).message(e.getMessage());
+
+			if (ad.getUser() == cliente.getUser()) {
+				return Response.status(ResponseStatus.ERROR).message("Cannot buy your own ad");
+			}
+			
+			if (ad.getStatus() == AdStatus.SOLD) {
+				return Response.status(ResponseStatus.ERROR).message("Ad was already sold");
+			}
+			
+			if (ad.getStatus() == AdStatus.PENDING) {
+				return Response.status(ResponseStatus.ERROR).message("Ad still pending");
+			}
+			
+			if (ad.getStatus() == AdStatus.BID_PENDING) {
+				return Response.status(ResponseStatus.ERROR).message("Ad already has a bid pending");
+			}
+			
+			Bid bid = new Bid(ad);
+			bid.setUser(cliente.getUser());
+			bid.setValue(message.getDouble("value"));
+			
+			try {
+				validateBid(bid);
+			} catch (Exception e) {
+				return Response.status(ResponseStatus.BAD_REQUEST).message(e.getMessage());
+			}
+			
+			ad.setStatus(AdStatus.BID_PENDING);
+			ad.setBid(bid);
+			
+			
+			Database.save(ad.getBid());
+			
+			return Response.ok().message("Ad purchased!");
+			
+		} finally {
+
+			ad.unlock();
+			
 		}
-		
-		ad.setStatus(AdStatus.BID_PENDING);
-		ad.setBid(bid);
-		
-		ad.unlock();
-		
-		Database.save(ad.getBid());
-		
-		return Response.ok().message("Ad purchased!");
 		
 	}
 

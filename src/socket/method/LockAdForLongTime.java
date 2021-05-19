@@ -16,14 +16,29 @@ public class LockAdForLongTime implements ProtocolMethod {
 		Ad ad = Database.getAd(adId);
 		
 		try {
+			
 			ad.lock();
-			Thread.sleep(10000);
+			
 		} catch (InterruptedException e) {
-			ad.unlock();
+		
 			return Response.status(ResponseStatus.ERROR).message("Internal server error");
+			
 		}
 		
-		ad.unlock();
+		try {
+			
+			Thread.sleep(10000);
+			
+		} catch (InterruptedException e) {
+			
+			return Response.status(ResponseStatus.ERROR).message("Internal server error");
+			
+		} finally {
+			
+			ad.unlock();
+			
+		}
+		
 		
 		return Response.ok().message("Long work was done!");
 		
